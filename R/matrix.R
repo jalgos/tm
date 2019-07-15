@@ -73,6 +73,10 @@ TermDocumentMatrix <-
 function(x, control = list())
     UseMethod("TermDocumentMatrix", x)
 
+TermDocumentMatrix2 <-
+function(x, tflist, control = list())
+    UseMethod("TermDocumentMatrix2", x)
+
 TermDocumentMatrix.SimpleCorpus <-
 function(x, control = list())
 {
@@ -147,6 +151,38 @@ function(x, control = list())
     .TermDocumentMatrix(m, control$weighting)
 }
 
+LearnTf <- function(x, control = list())
+{
+    tflist <- tm_parLapply(unname(content(x)), termFreq, control)
+    names(tflist) <- names(x)
+    TF <- rbindlist(lapply(seq_along(tflist),
+                           function(i) data.table(doc_id = names(tflist)[i],
+                                                  term = names(tflist[[i]]),
+                                                  freq = tflist[[i]])))
+    return(TF)
+}
+
+TF.to.vector <- function(TF, id)
+{
+    tf <- TF[doc_id == id, freq]
+    names(tf) <- TF[doc_id == id, term]
+    return(tf)
+}
+
+data.table.to.tflist <- function(TF)
+{
+    lapply(TF[, unique(doc_id)],
+           TF.to.vector,
+           TF = TF)
+}
+
+LearnWeightingParams <- function(TF, control = list())
+{
+    m <- TermDocumentMatrix.TF(TF, control = control)
+    return(list(docfreq = row_sums(m > 0),
+                ndoc = ndoc))
+}
+
 TermDocumentMatrix.PCorpus <-
 TermDocumentMatrix.VCorpus <-
 function(x, control = list())
@@ -167,6 +203,34 @@ function(x, control = list())
     .TermDocumentMatrix(m, control$weighting)
 }
 
+TermDocumentMatrix.TF <-
+function(TF, control = list())
+{
+    tflist <- data.table.to.tflist(TF)
+    v <- unlist(tflist)
+    i <- names(v)
+    terms <- sort(unique(as.character(if (is.null(control$dictionary)) i
+                                      else control$dictionary)))
+    i <- match(i, terms)
+    j <- rep.int(seq_along(TF[, unique(doc_id)]), lengths(tflist))
+
+    docs <- as.character(TF[, unique(doc_id)])
+    ndoc <- length(docs)
+
+    m <- simple_triplet_matrix(i, j, as.numeric(v),
+                               nrow = length(terms),
+                               ncol = ndoc,
+                               dimnames = list(Terms = terms, Docs = docs))
+    
+    m <- filter_global_bounds(m, control$bounds$global)
+
+    .TermDocumentMatrix(m, control$weighting)
+}
+
+DocumentTermMatrix.TF <-
+function(TF, control = list())
+    t(TermDocumentMatrix.TF(TF, control))
+    
 DocumentTermMatrix <-
 function(x, control = list())
     t(TermDocumentMatrix(x, control))

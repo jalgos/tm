@@ -95,11 +95,11 @@ weightSMART2 <- WeightFunction(function(m, spec = "nnn", control = list()) {
 
     ## Document frequency 
     if(!is.null(control$docfreq))
-        rs <- control$docfreq
+        rs <- control$docfreq + row_sums(m > 0)
     else
         rs <- row_sums(m > 0)
     if(!is.null(control$ndoc))
-        ndoc <- control$ndoc
+        ndoc <- control$ndoc + nDocs(m)
     else
         ndoc <- nDocs(m)
    
@@ -122,7 +122,7 @@ weightSMART2 <- WeightFunction(function(m, spec = "nnn", control = list()) {
                 paste(Docs(m)[cs == 0], collapse = " "))
     norm <- switch(normalization,
                    ## none
-                   n = rep.int(1, nDocs(m)),
+                   n = rep.int(1, ndoc),
                    ## cosine
                    c = sqrt(col_sums(m ^ 2)),
                    ## pivoted unique
@@ -138,7 +138,7 @@ weightSMART2 <- WeightFunction(function(m, spec = "nnn", control = list()) {
     b = {
         if (is.null(alpha <- control$alpha))
             stop("invalid control argument alpha")
-        norm <- double(nDocs(m))
+        norm <- double(ndoc)
         norm[match(names(charlengths),
                    seq_along(norm))] <-
             charlengths ^ alpha
