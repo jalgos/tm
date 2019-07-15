@@ -41,15 +41,6 @@ weightTfIdf <-
         if (isDTM) t(m) else m
     }, "term frequency - inverse document frequency", "tf-idf")
 
-weightModel <- function(m, spec = "nnn", control = list())
-{
-    docfreq <- row_sums(m > 0)
-    mode(docfreq) <- "integer"
-    
-    return(list("docfreq" = docfreq,
-                "ndoc" = nDocs(m)))
-}
-
 weightSMART2 <- WeightFunction(function(m, spec = "nnn", control = list()) {
     stopifnot(inherits(m, c("DocumentTermMatrix", "TermDocumentMatrix")),
               is.character(spec), nchar(spec) == 3L, is.list(control))
