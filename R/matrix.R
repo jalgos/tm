@@ -73,10 +73,6 @@ TermDocumentMatrix <-
 function(x, control = list())
     UseMethod("TermDocumentMatrix", x)
 
-TermDocumentMatrix2 <-
-function(x, tflist, control = list())
-    UseMethod("TermDocumentMatrix2", x)
-
 TermDocumentMatrix.SimpleCorpus <-
 function(x, control = list())
 {
