@@ -152,10 +152,19 @@ LearnTf <- function(x, control = list())
     tflist <- tm_parLapply(unname(content(x)), termFreq, control)
     names(tflist) <- names(x)
     TF <- rbindlist(lapply(seq_along(tflist),
-                           function(i) data.table(doc_id = names(tflist)[i],
-                                                  term = names(tflist[[i]]),
-                                                  freq = tflist[[i]])))
+                           ith.tf.data.table,
+                           tflist = tflist))
     return(TF)
+}
+
+ith.tf.data.table <- function(tflist, i)
+{
+    if(length(tflist[[i]]) < 1)
+        NULL
+    else
+        data.table(doc_id = names(tflist)[i],
+                   term = names(tflist[[i]]),
+                   freq = tflist[[i]])
 }
 
 TF.to.vector <- function(TF, id)
@@ -176,7 +185,7 @@ LearnWeightingParams <- function(TF, control = list())
 {
     m <- TermDocumentMatrix.TF(TF, control = control)
     return(list(docfreq = row_sums(m > 0),
-                ndoc = ndoc))
+                ndoc = nDocs(m)))
 }
 
 TermDocumentMatrix.PCorpus <-
