@@ -211,6 +211,9 @@ function(x, control = list())
 TermDocumentMatrix.TF <-
 function(TF, control = list())
 {
+    if(!is.null(control$dictionary))
+        TF <- TF[term %in% control$dictionary]
+    
     tflist <- data.table.to.tflist(TF)
     v <- unlist(tflist)
     i <- names(v)
