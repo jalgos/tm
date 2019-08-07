@@ -154,6 +154,9 @@ LearnTf <- function(x, control = list())
     TF <- rbindlist(lapply(seq_along(tflist),
                            ith.tf.data.table,
                            tflist = tflist))
+    TF[, doc_id := factor(doc_id)]
+    TF[, term := factor(term)]
+    setkeyv(TF, c("doc_id", "term"))
     return(TF)
 }
 
