@@ -170,18 +170,9 @@ ith.tf.data.table <- function(tflist, i)
                    freq = tflist[[i]])
 }
 
-TF.to.vector <- function(TF, id)
-{
-    tf <- TF[doc_id == id, freq]
-    names(tf) <- TF[doc_id == id, term]
-    return(tf)
-}
-
 data.table.to.tflist <- function(TF)
 {
-    lapply(TF[, unique(doc_id)],
-           TF.to.vector,
-           TF = TF)
+    TF[, .(list(setNames(freq, term))), by = doc_id][, V1]
 }
 
 LearnWeightingParams <- function(TF, control = list())
