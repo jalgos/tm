@@ -154,6 +154,8 @@ LearnTf <- function(x, control = list())
     TF <- rbindlist(lapply(seq_along(tflist),
                            ith.tf.data.table,
                            tflist = tflist))
+    if(nrow(TF) < 1)
+        return(TF)
     TF[, doc_id := factor(doc_id)]
     TF[, term := factor(term)]
     setkeyv(TF, c("doc_id", "term"))
