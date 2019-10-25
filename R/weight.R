@@ -86,11 +86,11 @@ weightSMART2 <- WeightFunction(function(m, spec = "nnn", control = list()) {
 
     ## Document frequency 
     if(!is.null(control$docfreq))
-        rs <- control$docfreq + row_sums(m > 0)
+        rs <- control$docfreq
     else
         rs <- row_sums(m > 0)
     if(!is.null(control$ndoc))
-        ndoc <- control$ndoc + nDocs(m)
+        ndoc <- control$ndoc
     else
         ndoc <- nDocs(m)
    
