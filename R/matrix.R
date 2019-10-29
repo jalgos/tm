@@ -165,7 +165,9 @@ LearnTf <- function(x, control = list())
 ith.tf.data.table <- function(tflist, i)
 {
     if(length(tflist[[i]]) < 1)
-        NULL
+        data.table(doc_id = character(0),
+                   term = character(0),
+                   freq = integer(0))
     else
         data.table(doc_id = names(tflist)[i],
                    term = names(tflist[[i]]),
